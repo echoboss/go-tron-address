@@ -10,19 +10,30 @@ import (
 
 
 func main() {
+	// https://developers.tron.network/docs/account
+
+	// #1
 	key, _ := crypto.GenerateKey()
 	priv := key.D.Bytes()
 	pubX := key.X.Bytes()
 	pubY := key.Y.Bytes()
 	pub := append(pubX,pubY...)
+
+	// #2
 	hash := sha3.NewLegacyKeccak256() // the missing piece
 	hash.Write(pub)
 	hashed := hash.Sum(nil)
 	last20 := hashed[len(hashed)-20:]
+
+	// #3
 	addr41 := append([]byte{0x41}, last20...)
+
+	// #4
 	hash2561 := sha256.Sum256(addr41)
 	hash2562 := sha256.Sum256(hash2561[:])
 	checksum:=hash2562[:4]
+
+	// #5/#6
 	naddr := append(addr41, checksum...)
 	tronAddr := base58.Encode(naddr)
 
