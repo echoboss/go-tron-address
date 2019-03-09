@@ -7,7 +7,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/btcsuite/btcd/btcec"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/sasaxie/go-client-api/common/base58"
 	"golang.org/x/crypto/sha3"
 	"math/big"
@@ -21,9 +20,6 @@ import (
 func main() {
 	// Use the ECDSA crypto library to generate the Tron Address
 	generateNewKey()
-
-	// Use the Ethereum crypto library to generate the Tron Address
-	generateNewKeyEth()
 
 	// Using a hex of a private key extract the Tron Address
 	addressFromKey("F43EBCC94E6C257EDBE559183D1A8778B2D5A08040902C0F0A77A3343A1D0EA5") // TWVRXXN5tsggjUCDmqbJ4KxPdJKQiynaG6
@@ -63,40 +59,6 @@ func generateNewKey() {
 	fmt.Println("tronAddr: (" + fmt.Sprintf("%d", len(tronAddr)) + ") " + tronAddr)
 
 	fmt.Println("******************* New Key Using ECDSA *******************")
-}
-
-func generateNewKeyEth() {
-	fmt.Println("******************* New Key Using Ethereum Lib *******************")
-	// Creating a new address via the ethereum library
-	// #1
-	key, _ := crypto.GenerateKey()
-	priv := key.D.Bytes()
-	pubX := key.X.Bytes()
-	pubY := key.Y.Bytes()
-	pub := append(pubX,pubY...)
-
-	// #2
-	hash := sha3.NewLegacyKeccak256()
-	hash.Write(pub)
-	hashed := hash.Sum(nil)
-	last20 := hashed[len(hashed)-20:]
-
-	// #3
-	addr41 := append([]byte{0x41}, last20...)
-
-	// #4
-	hash2561 := sha256.Sum256(addr41)
-	hash2562 := sha256.Sum256(hash2561[:])
-	checksum := hash2562[:4]
-
-	// #5/#6
-	rawAddr := append(addr41, checksum...)
-	tronAddr := base58.Encode(rawAddr)
-
-	fmt.Println("Private key: (" + fmt.Sprintf("%d", len(priv)) + ") " + fmt.Sprintf("%x", priv))
-	fmt.Println("tronAddr: (" + fmt.Sprintf("%d", len(tronAddr)) + ") " + tronAddr)
-
-	fmt.Println("*******************  New Key Using Ethereum Lib *******************")
 }
 
 func addressFromKey(keyStr string) {
